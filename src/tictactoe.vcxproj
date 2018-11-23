@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4C7CC3FE-3113-4287-887C-3CD4B6C64586}</ProjectGuid>
-    <RootNamespace>teapotLab</RootNamespace>
-    <ProjectName>HapticTeapotTest</ProjectName>
+    <RootNamespace>tictactoe</RootNamespace>
+    <ProjectName>tictactoe</ProjectName>
     <WindowsTargetPlatformVersion>10.0.14393.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
