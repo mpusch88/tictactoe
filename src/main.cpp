@@ -12,77 +12,72 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include <iostream>
 #include <sstream>
 #include <iomanip>
-
 #include "Timer.h"
 #include <GL/glut.h>
-//#include "teapot.h"
-//#include "square.h"
+
+// Colours from teapot.h
+// float diffuseColor[3] = { 0.929524f, 0.796542f, 0.178823f }; // color yellow original
+// float diffuseColorRed[3] = { 0.929524f, 0.1f, 0.178823f }; // color red - eliminate shading
+// float diffuseColorPurple[3] = { 0.3f, 0.53f, 0.54f }; // color purple - eliminate shading
+// float specularColor[4] = { 1.00000f, 0.980392f, 0.549020f, 1.0f };
 
 // stereoscopic view parameters begin
 
-float diffuseColor[3] = { 0.929524f, 0.796542f, 0.178823f }; // color yellow original
-float diffuseColorRed[3] = { 0.929524f, 0.1f, 0.178823f }; // color red - eliminate shading
-float diffuseColorPurple[3] = { 0.3f, 0.53f, 0.54f }; // color purple - eliminate shading
+    typedef struct {
+    double x,y,z;
+    } XYZ;
+    typedef struct {
+    XYZ vp;              /* View position           */
+    XYZ vd;              /* View direction vector   */
+    XYZ vu;              /* View up direction       */
+    double focalLength;  /* Focal Length along vd   */
+    double aperture;     /* Camera aperture         */
+    double eyeSep;       /* Eye separation - interpupilar distance    */
+    } CAMERA;
 
-float specularColor[4] = { 1.00000f, 0.980392f, 0.549020f, 1.0f };
+    CAMERA camera;
 
-typedef struct {
-   double x,y,z;
-} XYZ;
-typedef struct {
-   XYZ vp;              /* View position           */
-   XYZ vd;              /* View direction vector   */
-   XYZ vu;              /* View up direction       */
-   double focalLength;  /* Focal Length along vd   */
-   double aperture;     /* Camera aperture         */
-   double eyeSep;       /* Eye separation - interpupilar distance    */
-} CAMERA;
+    #define PI      3.141592653589793238462643
+    #define DTOR    0.0174532925                // DEGREE TO RADIAN
+    #define RTOD    57.2957795                  // RADIAN TO DEGREE
 
-CAMERA camera;
-
-#define PI 3.141592653589793238462643
-#define DTOR            0.0174532925   // DEGREE TO RADIAN
-#define RTOD            57.2957795     // RADIAN TO DEGREE
 // stereoscopic view parameters end
 
-#define HAPTIC // comment this line to take the haptic off
-   
+#define HAPTIC              // comment this line to take the haptic off
 
 // haptic code begin
-#ifdef HAPTIC
 
-#include <HL/hl.h>
-#include <HDU/hduMatrix.h>
-#include <HDU/hduError.h>
-#include <HLU/hlu.h>
+    #ifdef HAPTIC
+
+    #include <HL/hl.h>
+    #include <HDU/hduMatrix.h>
+    #include <HDU/hduError.h>
+    #include <HLU/hlu.h>
 
 
-/* Haptic device and rendering context handles. */
-static HHD ghHD = HD_INVALID_HANDLE;
-static HHLRC ghHLRC = 0;
+    /* Haptic device and rendering context handles. */
+    static HHD ghHD = HD_INVALID_HANDLE;
+    static HHLRC ghHLRC = 0;
 
-/* Shape id for shape we will render haptically. */
-HLuint gTeapotShapeId;
-HLuint gSquareId [9];
-#define CURSOR_SCALE_SIZE 60
-static double gCursorScale;
-static GLuint gCursorDisplayList = 0;
-#else
-#include <math.h>
-#endif
+    /* Shape id for shape we will render haptically. */
+    HLuint gTeapotShapeId;
+    HLuint gSquareId [9];
+    #define CURSOR_SCALE_SIZE 60
+    static double gCursorScale;
+    static GLuint gCursorDisplayList = 0;
+    #else
+    #include <math.h>
+    #endif
 
-// haptic code finish
-
+// haptic code finished
 
 using std::stringstream;
 using std::cout;
 using std::endl;
 using std::ends;
-
 
 // GLUT CALLBACK functions
 void displayCB();
@@ -106,9 +101,6 @@ void showFPS();
 void drawScene();
 void drawMono();
 
-
-
-
 void drawObject();
 void drawEye(int eye);
 void drawInStereo();
@@ -117,35 +109,30 @@ void normalise(XYZ *p);
 XYZ crossProduct(XYZ p1, XYZ p2);
 void color();
 void drawSquare(float x, float y, float z);
+
 // haptic code begin
-#ifdef HAPTIC
-void exitHandler(void);
-void initHL();
-void drawSceneHaptics();
-void drawHapticCursor();
-void updateWorkspace();
-#endif
+    #ifdef HAPTIC
+    void exitHandler(void);
+    void initHL();
+    void drawSceneHaptics();
+    void drawHapticCursor();
+    void updateWorkspace();
+    #endif
 // haptic code finish
 
-
 // global variables
+GLuint listId = 0;                      // REMOVE THIS AND REFS!
+
 void *font = GLUT_BITMAP_8_BY_13;
-GLuint listId = 0; // id of display list
 bool mouseLeftDown;
 bool mouseRightDown;
 float mouseX, mouseY;
-//float cameraAngleX = 0; // original
-//float cameraAngleY = 0;
-
-float cameraAngleX = 45.0;
-float cameraAngleY = -145.0;
-
-
+float cameraAngleX = 45.0;              // SET ME!
+float cameraAngleY = -145.0;            // SET ME!
 float cameraDistance;
 int drawMode = 0;
 Timer timer;
 bool stereoMethod;
-
 float ratio=1.777; // screen ratio = width / height = 16:9 = 1.7777   width/hight = 1.333 = 4:3
 float foview=60.;
 
@@ -166,22 +153,12 @@ float farP=40;
 int colorIndex=3; // 3 colors - red, green, blue
 bool touched; // haptic code
 int stereo=1; // if stereo=0 rendering mono view 
-/*GLuint id1;
-GLuint id2;
-GLuint id3;
-GLuint id4;
-GLuint id5;
-GLuint id6; 
-GLuint id7;
-GLuint id8;
-GLuint id9;*/
 
-//GLuint id[9];
 // haptic callback
 #ifdef HAPTIC
 void HLCALLBACK touchShapeCallback(HLenum event, HLuint object, HLenum thread, 
-                                   HLcache *cache, void *userdata)
-{
+                                   HLcache *cache, void *userdata){
+
 	touched=!touched;
 	color();
 }
@@ -203,60 +180,57 @@ void color(){
 	}
 }
 
+void drawSquare(float x, float y, float z){
 
-
-void drawSquare(float x, float y, float z) {
 	glPushMatrix();
-	//CAVENavTransform();
-	glTranslatef(x, y, z);
-	//glTranslatef(0, 0, -6.0);
+	//CAVENavTransform();               // ??
 
-	//glRotatef(rotateAmt, 0, 1, 0);
-	glColor3f(0.7, 0.7, 0.99);
+	glTranslatef(x, y, z);              // USE PARAMS
+	glColor3f(0.7, 0.7, 0.99);          // SET ME (?)
 
 	glBegin(GL_QUADS);
-	// Top
-	glNormal3d(0, 1, 0);
-	glVertex3d(-2.0 / 2, 2.0 / 2, 1.0);
-	glVertex3d(2.0 / 2, 2.0 / 2, 1.0);
-	glVertex3d(2.0 / 2, 2.0 / 2, -1.0);
-	glVertex3d(-2.0 / 2, 2.0 / 2, -1.0);
-	// Back
-	glNormal3d(0, 0, 1);
-	glVertex3d(-2.0 / 2, 2.0 / 2, 1.0);
-	glVertex3d(-2.0 / 2, -2.0 / 2, 1.0);
-	glVertex3d(2.0 / 2, -2.0 / 2, 1.0);
-	glVertex3d(2.0 / 2, 2.0 / 2, 1.0);
-	// Front
-	glNormal3d(0, 0, -1);
-	glVertex3d(-2.0 / 2, 2.0 / 2, -1);
-	glVertex3d(2.0 / 2, 2.0 / 2, -1);
-	glVertex3d(2.0 / 2, -2.0 / 2, -1);
-	glVertex3d(-2.0 / 2, -2.0 / 2, -1);
-	// Left
-	glNormal3d(1, 0, 0);
-	glVertex3d(2.0 / 2, 2.0 / 2, -1);
-	glVertex3d(2.0 / 2, 2.0 / 2, 1.0);
-	glVertex3d(2.0 / 2, -2.0 / 2, 1.0);
-	glVertex3d(2.0 / 2, -2.0 / 2, -1);
-	// Right
-	glNormal3d(-1, 0, 0);
-	glVertex3d(-2.0 / 2, 2.0 / 2, 1.0);
-	glVertex3d(-2.0 / 2, 2.0 / 2, -1);
-	glVertex3d(-2.0 / 2, -2.0 / 2, -1);
-	glVertex3d(-2.0 / 2, -2.0 / 2, 1.0);
-	// Bottom
-	glNormal3d(0, -1, 0);
-	glVertex3d(-2.0 / 2, -2.0 / 2, 1.0);
-	glVertex3d(-2.0 / 2, -2.0 / 2, -1);
-	glVertex3d(2.0 / 2, -2.0 / 2, -1);
-	glVertex3d(2.0 / 2, -2.0 / 2, 1.0);
-	glEnd();
-
+        // Top
+        glNormal3d(0, 1, 0);
+        glVertex3d(-2.0 / 2, 2.0 / 2, 1.0);
+        glVertex3d(2.0 / 2, 2.0 / 2, 1.0);
+        glVertex3d(2.0 / 2, 2.0 / 2, -1.0);
+        glVertex3d(-2.0 / 2, 2.0 / 2, -1.0);
+        // Back
+        glNormal3d(0, 0, 1);
+        glVertex3d(-2.0 / 2, 2.0 / 2, 1.0);
+        glVertex3d(-2.0 / 2, -2.0 / 2, 1.0);
+        glVertex3d(2.0 / 2, -2.0 / 2, 1.0);
+        glVertex3d(2.0 / 2, 2.0 / 2, 1.0);
+        // Front
+        glNormal3d(0, 0, -1);
+        glVertex3d(-2.0 / 2, 2.0 / 2, -1);
+        glVertex3d(2.0 / 2, 2.0 / 2, -1);
+        glVertex3d(2.0 / 2, -2.0 / 2, -1);
+        glVertex3d(-2.0 / 2, -2.0 / 2, -1);
+        // Left
+        glNormal3d(1, 0, 0);
+        glVertex3d(2.0 / 2, 2.0 / 2, -1);
+        glVertex3d(2.0 / 2, 2.0 / 2, 1.0);
+        glVertex3d(2.0 / 2, -2.0 / 2, 1.0);
+        glVertex3d(2.0 / 2, -2.0 / 2, -1);
+        // Right
+        glNormal3d(-1, 0, 0);
+        glVertex3d(-2.0 / 2, 2.0 / 2, 1.0);
+        glVertex3d(-2.0 / 2, 2.0 / 2, -1);
+        glVertex3d(-2.0 / 2, -2.0 / 2, -1);
+        glVertex3d(-2.0 / 2, -2.0 / 2, 1.0);
+        // Bottom
+        glNormal3d(0, -1, 0);
+        glVertex3d(-2.0 / 2, -2.0 / 2, 1.0);
+        glVertex3d(-2.0 / 2, -2.0 / 2, -1);
+        glVertex3d(2.0 / 2, -2.0 / 2, -1);
+        glVertex3d(2.0 / 2, -2.0 / 2, 1.0);
+    glEnd();
 	glPopMatrix();
-
 }
-///////////////////////////////////////////////////////////////////////////////
+
+************************************************************************************
+
 int main(int argc, char **argv)
 {
     // initialize global variables
@@ -269,7 +243,6 @@ int main(int argc, char **argv)
 
 	// parameters for 3d stereoscopy
 	camera.aperture = foview;// field of view
-
 	camera.focalLength = 14;
     camera.eyeSep = camera.focalLength /60; // separation of the eyes
 
@@ -280,10 +253,12 @@ int main(int argc, char **argv)
 	camera.vp.x = 0;
     camera.vp.y = 0;
     camera.vp.z = 10;
+
     //view direction vector
     camera.vd.x = 0; 
     camera.vd.y = 0; 
     camera.vd.z = -1;
+
     //view up vector
     camera.vu.x = 0;  
     camera.vu.y = 1; 
@@ -291,14 +266,11 @@ int main(int argc, char **argv)
 
     // init GLUT and GL
     initGLUT(argc, argv);
-    initGL(); //initialize opengl light and camera
+    initGL();       //initialize opengl light and camera
+
 	#ifdef HAPTIC
 		initHL(); //initialize haptic device
 	#endif
-
-    // compile a display list of teapot mesh
-    // see detail in createTeapotDL()
-    //listId = createTeapotDL(); // listId
 
     // the last GLUT call (LOOP)
     // window will be shown and display callback is triggered by events
@@ -440,8 +412,6 @@ bool initSharedMem()
     return true;
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // clean up shared memory
 ///////////////////////////////////////////////////////////////////////////////
@@ -450,8 +420,6 @@ void clearSharedMem()
     if(listId)
         glDeleteLists(listId, 1); // delete one
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // initialize lights
@@ -473,8 +441,6 @@ void initLights()
     glEnable(GL_LIGHT0);                        // MUST enable each light source after configuration
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // set camera position and lookat direction
 ///////////////////////////////////////////////////////////////////////////////
@@ -484,8 +450,6 @@ void setCamera(float posX, float posY, float posZ, float targetX, float targetY,
     glLoadIdentity();
     gluLookAt(posX, posY, posZ, targetX, targetY, targetZ, 0, 1, 0); // eye(x,y,z), focal(x,y,z), up(x,y,z)
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // display info messages
@@ -552,8 +516,6 @@ void showInfo()
     glPopMatrix();                   // restore to previous modelview matrix
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // display frame rates
 ///////////////////////////////////////////////////////////////////////////////
@@ -601,12 +563,9 @@ void showFPS()
     glPopMatrix();                      // restore to previous modelview matrix
 }
 
-
-
 //=============================================================================
 // CALLBACKS
 //=============================================================================
-
 void displayCB()
 {	
 	if (stereo==1)
@@ -665,13 +624,11 @@ void reshapeCB(int w, int h)
 	#endif
 }
 
-
 void timerCB(int millisec)
 {
     glutTimerFunc(millisec, timerCB, millisec);
     glutPostRedisplay();
 }
-
 
 void idleCB()
 {
@@ -692,7 +649,6 @@ void idleCB()
 
     glutPostRedisplay();
 }
-
 
 void keyboardCB(unsigned char key, int x, int y)
 {
@@ -741,7 +697,6 @@ void keyboardCB(unsigned char key, int x, int y)
     glutPostRedisplay();
 }
 
-
 void mouseCB(int button, int state, int x, int y)
 {
     mouseX = x;
@@ -768,7 +723,6 @@ void mouseCB(int button, int state, int x, int y)
     }
 }
 
-
 void mouseMotionCB(int x, int y)
 {
     if(mouseLeftDown)
@@ -786,7 +740,6 @@ void mouseMotionCB(int x, int y)
 
     glutPostRedisplay();
 }
-
 
 // haptic code begin
 #ifdef HAPTIC
@@ -970,9 +923,8 @@ void drawSceneHaptics()
 
 	// Call any event callbacks that have been triggered.
     hlCheckEvents();
-
-
 }
+
 /*******************************************************************************
  Draws a 3D cursor for the haptic device using the current local transform,
  the workspace to world transform and the screen coordinate scale.
@@ -989,17 +941,14 @@ void drawHapticCursor()
     glPushAttrib(GL_CURRENT_BIT | GL_ENABLE_BIT | GL_LIGHTING_BIT);
     glPushMatrix();
 
-    if (!gCursorDisplayList)
-    {
+    if (!gCursorDisplayList){
         gCursorDisplayList = glGenLists(1);
         glNewList(gCursorDisplayList, GL_COMPILE);
         qobj = gluNewQuadric();
                
-        gluCylinder(qobj, 0.0, kCursorRadius, kCursorHeight,
-                    kCursorTess, kCursorTess);
+        gluCylinder(qobj, 0.0, kCursorRadius, kCursorHeight, kCursorTess, kCursorTess);
         glTranslated(0.0, 0.0, kCursorHeight);
-        gluCylinder(qobj, kCursorRadius, 0.0, kCursorHeight / 5.0,
-                    kCursorTess, kCursorTess);
+        gluCylinder(qobj, kCursorRadius, 0.0, kCursorHeight / 5.0, kCursorTess, kCursorTess);
     
         gluDeleteQuadric(qobj);
         glEndList();
@@ -1011,139 +960,147 @@ void drawHapticCursor()
 
     // Apply the local cursor scale factor.
     glScaled(gCursorScale, gCursorScale, gCursorScale);
-
     glEnable(GL_COLOR_MATERIAL);
     glColor3f(0.0, 0.5, 1.0);
-
     glCallList(gCursorDisplayList);
-
     glPopMatrix(); 
     glPopAttrib();
 }
 #endif
-// hatic code finish
-
+// haptic code finished
 
 // draw 3d stereoscopic view
 void drawInStereo(){
+
 	// one camera - 2 frustums --> stereoscopy with each eye equal to one frustrum
 	if (stereoMethod==1){
 		drawEye(1); // draw left eye
 		drawEye(2); // draw right eye
 	}
+
 	else{
 	// frustum parameters for 2 cameras --> stereoscopy with each eye equal to one camera
 		drawEyeLookAt();
 	}
-
-	}
-
+}
 
 // with 3d stereoscopic view (one camera - 2 frustums --> stereoscopy with each eye equal to one frustrum)
 void drawEye(int eye){
-		float dx0=-0.070 / 4.0; // used for moving the frustum
-		float dx1=0.40 / 4.0;   // used for half-distance between 2 eyes
-		glDrawBuffer(GL_BACK_LEFT);
-		if (eye==1){
-			glDrawBuffer (GL_BACK_RIGHT);
-			dx0=-dx0;
-			dx1=-dx1;
-		}
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glFrustum(-frustumRight-dx0, frustumRight-dx0, -frustumTop, frustumTop,nNear,nFar);
-		glTranslatef(0+dx1,0,0);
-		glMatrixMode(GL_MODELVIEW);
-		glShadeModel(GL_SMOOTH);
-		drawScene();
-        glFlush();
-	}
 
+    float dx0=-0.070 / 4.0; // used for moving the frustum
+    float dx1=0.40 / 4.0;   // used for half-distance between 2 eyes
+
+    glDrawBuffer(GL_BACK_LEFT);
+
+    if (eye==1){
+        glDrawBuffer (GL_BACK_RIGHT);
+        dx0=-dx0;
+        dx1=-dx1;
+    }
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glFrustum(-frustumRight-dx0, frustumRight-dx0, -frustumTop, frustumTop,nNear,nFar);
+    glTranslatef(0+dx1,0,0);
+    glMatrixMode(GL_MODELVIEW);
+    glShadeModel(GL_SMOOTH);
+    drawScene();
+    glFlush();
+}
 
 // without 3d stereoscopic view
 void drawMono(){
-	 float radians = DTOR * camera.aperture / 2;
-	 float wd2     = nearP * tan(radians);
-   float ndfl    = nearP / camera.focalLength;
+
+	float radians = DTOR * camera.aperture / 2;
+	float wd2     = nearP * tan(radians);
+    float ndfl    = nearP / camera.focalLength;
+
 	glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+
     left  = - ratio * wd2;
 	right =   ratio * wd2;
     top    =   wd2;
     bottom = - wd2;
-    glFrustum(left,right,bottom,top,nearP,farP);
 
+    glFrustum(left,right,bottom,top,nearP,farP);
     glMatrixMode(GL_MODELVIEW);
-    glDrawBuffer(GL_BACK);
+    glDrawBuffer(GL_BACK);          // hmmm
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     gluLookAt(camera.vp.x,camera.vp.y,camera.vp.z,
-                camera.vp.x + camera.vd.x,
-                camera.vp.y + camera.vd.y,
-                camera.vp.z + camera.vd.z,
-                camera.vu.x,camera.vu.y,camera.vu.z);
+              camera.vp.x + camera.vd.x,
+              camera.vp.y + camera.vd.y,
+              camera.vp.z + camera.vd.z,
+              camera.vu.x,camera.vu.y,camera.vu.z);
 	drawScene();
 }
-
 
 // with 3d stereoscopic view (2 cameras --> stereoscopy with each eye equal to one camera)
 void drawEyeLookAt(){
 	
-   float radians = DTOR * camera.aperture / 2;
+    float radians = DTOR * camera.aperture / 2;
+    float wd2     = nearP * tan(radians);
+    float ndfl    = nearP / camera.focalLength;
 
-   float wd2     = nearP * tan(radians);
-   float ndfl    = nearP / camera.focalLength;
+    XYZ r = crossProduct(camera.vd,camera.vu);
+    normalise(&r);      // direction btw 2 cameras (right and left eyes, respectively)
 
+    r.x *= camera.eyeSep / 2.0;
+    r.y *= camera.eyeSep / 2.0;
+    r.z *= camera.eyeSep / 2.0;
 
-     
-      XYZ r = crossProduct(camera.vd,camera.vu);
-      normalise(&r); // direction btw 2 cameras (right and left eyes, respectively) 
-      r.x *= camera.eyeSep / 2.0;
-      r.y *= camera.eyeSep / 2.0;
-      r.z *= camera.eyeSep / 2.0;
+    // draw right eye - camera 1
 
-	  // draw right eye - camera 1
-	  glDrawBuffer(GL_BACK_RIGHT);
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      left  = - ratio * wd2 - 0.5 * camera.eyeSep * ndfl;
-      right =   ratio * wd2 - 0.5 * camera.eyeSep * ndfl;
-      top    =   wd2;
-      bottom = - wd2;
-      glFrustum(left,right,bottom,top,nearP,farP);
+        glDrawBuffer(GL_BACK_RIGHT);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
 
-      glMatrixMode(GL_MODELVIEW);
-      //glDrawBuffer(GL_BACK_RIGHT);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glLoadIdentity();
-      gluLookAt(camera.vp.x + r.x, camera.vp.y + r.y,camera.vp.z + r.z,
-                camera.vp.x + r.x + camera.vd.x,
-                camera.vp.y + r.y + camera.vd.y,
-                camera.vp.z + r.z + camera.vd.z,
-                camera.vu.x,camera.vu.y,camera.vu.z);
-      drawScene();
-	  glFlush();
+        left  = - ratio * wd2 - 0.5 * camera.eyeSep * ndfl;
+        right =   ratio * wd2 - 0.5 * camera.eyeSep * ndfl;
+        top    =   wd2;
+        bottom = - wd2;
 
-	 // draw left eye - camera 2
-	  glDrawBuffer(GL_BACK_LEFT);
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      left  = - ratio * wd2 + 0.5 * camera.eyeSep * ndfl;
-      right =   ratio * wd2 + 0.5 * camera.eyeSep * ndfl;
-      top    =   wd2;
-      bottom = - wd2;
-      glFrustum(left,right,bottom,top,nearP,farP);
-      
-	  glMatrixMode(GL_MODELVIEW);
-      //glDrawBuffer(GL_BACK_LEFT);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      glLoadIdentity();
-      gluLookAt(camera.vp.x - r.x, camera.vp.y - r.y,camera.vp.z - r.z,
-                camera.vp.x - r.x + camera.vd.x,
-                camera.vp.y - r.y + camera.vd.y,
-                camera.vp.z - r.z + camera.vd.z,
-                camera.vu.x,camera.vu.y,camera.vu.z);
+        glFrustum(left,right,bottom,top,nearP,farP);
+        glMatrixMode(GL_MODELVIEW);
+
+        //glDrawBuffer(GL_BACK_RIGHT);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+        gluLookAt(camera.vp.x + r.x, camera.vp.y + r.y,camera.vp.z + r.z,
+                  camera.vp.x + r.x + camera.vd.x,
+                  camera.vp.y + r.y + camera.vd.y,
+                  camera.vp.z + r.z + camera.vd.z,
+                  camera.vu.x,camera.vu.y,camera.vu.z);
+        drawScene();
+        glFlush();
+
+    // draw left eye - camera 2
+
+        glDrawBuffer(GL_BACK_LEFT);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+
+        left  = - ratio * wd2 + 0.5 * camera.eyeSep * ndfl;
+        right =   ratio * wd2 + 0.5 * camera.eyeSep * ndfl;
+        top    =   wd2;
+        bottom = - wd2;
+
+        glFrustum(left,right,bottom,top,nearP,farP);
+    
+        glMatrixMode(GL_MODELVIEW);
+
+        //glDrawBuffer(GL_BACK_LEFT);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glLoadIdentity();
+        gluLookAt(camera.vp.x - r.x, camera.vp.y - r.y,camera.vp.z - r.z,
+                  camera.vp.x - r.x + camera.vd.x,
+                  camera.vp.y - r.y + camera.vd.y,
+                  camera.vp.z - r.z + camera.vd.z,
+                  camera.vu.x,camera.vu.y,camera.vu.z);
     
 	drawScene();
 	glFlush();
@@ -1152,24 +1109,29 @@ void drawEyeLookAt(){
 }
 
 void drawScene(){
+
 	drawObject();
+
 	#ifdef HAPTIC
-	drawHapticCursor();
+	    drawHapticCursor();
 	#endif
+
 	showInfo();
     showFPS();
 }
 
-void normalise(XYZ *p)
-{
-   double length;
+void normalise(XYZ *p){
 
+   double length;
    length = sqrt(p->x * p->x + p->y * p->y + p->z * p->z);
+
    if (length != 0) {
       p->x /= length;
       p->y /= length;
       p->z /= length;
-   } else {
+   } 
+   
+   else {
       p->x = 0;
       p->y = 0;
       p->z = 0;
@@ -1177,10 +1139,12 @@ void normalise(XYZ *p)
 }
 
 XYZ crossProduct(XYZ p1, XYZ p2){ 
-	XYZ p3;
-   p3.x = p1.y*p2.z - p1.z*p2.y;
-   p3.y = p1.z*p2.x - p1.x*p2.z;
-   p3.z = p1.x*p2.y - p1.y*p2.x;
-   return p3;
-}
 
+    XYZ p3;
+
+    p3.x = p1.y*p2.z - p1.z*p2.y;
+    p3.y = p1.z*p2.x - p1.x*p2.z;
+    p3.z = p1.x*p2.y - p1.y*p2.x;
+
+    return p3;
+}
