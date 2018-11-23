@@ -23,6 +23,12 @@
 
 // stereoscopic view parameters begin
 
+float diffuseColor[3] = { 0.929524f, 0.796542f, 0.178823f }; // color yellow original
+float diffuseColorRed[3] = { 0.929524f, 0.1f, 0.178823f }; // color red - eliminate shading
+float diffuseColorPurple[3] = { 0.3f, 0.53f, 0.54f }; // color purple - eliminate shading
+
+float specularColor[4] = { 1.00000f, 0.980392f, 0.549020f, 1.0f };
+
 typedef struct {
    double x,y,z;
 } XYZ;
