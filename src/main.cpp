@@ -19,7 +19,8 @@
 
 #include "Timer.h"
 #include <GL/glut.h>
-#include "teapot.h"
+//#include "teapot.h"
+//#include "square.h"
 
 // stereoscopic view parameters begin
 
@@ -66,7 +67,7 @@ static HHLRC ghHLRC = 0;
 
 /* Shape id for shape we will render haptically. */
 HLuint gTeapotShapeId;
-
+HLuint gSquareId [9];
 #define CURSOR_SCALE_SIZE 60
 static double gCursorScale;
 static GLuint gCursorDisplayList = 0;
@@ -107,6 +108,7 @@ void drawMono();
 
 
 
+
 void drawObject();
 void drawEye(int eye);
 void drawInStereo();
@@ -114,7 +116,7 @@ void drawEyeLookAt();
 void normalise(XYZ *p);
 XYZ crossProduct(XYZ p1, XYZ p2);
 void color();
-
+void drawSquare(float x, float y, float z);
 // haptic code begin
 #ifdef HAPTIC
 void exitHandler(void);
@@ -164,7 +166,17 @@ float farP=40;
 int colorIndex=3; // 3 colors - red, green, blue
 bool touched; // haptic code
 int stereo=1; // if stereo=0 rendering mono view 
+/*GLuint id1;
+GLuint id2;
+GLuint id3;
+GLuint id4;
+GLuint id5;
+GLuint id6; 
+GLuint id7;
+GLuint id8;
+GLuint id9;*/
 
+//GLuint id[9];
 // haptic callback
 #ifdef HAPTIC
 void HLCALLBACK touchShapeCallback(HLenum event, HLuint object, HLenum thread, 
@@ -189,6 +201,60 @@ void color(){
 			diffuseColor[i]=diffuseColorRed[i];
 		}
 	}
+}
+
+
+
+void drawSquare(float x, float y, float z) {
+	glPushMatrix();
+	//CAVENavTransform();
+	glTranslatef(x, y, z);
+	//glTranslatef(0, 0, -6.0);
+
+	//glRotatef(rotateAmt, 0, 1, 0);
+	glColor3f(0.7, 0.7, 0.99);
+
+	glBegin(GL_QUADS);
+	// Top
+	glNormal3d(0, 1, 0);
+	glVertex3d(-2.0 / 2, 2.0 / 2, 1.0);
+	glVertex3d(2.0 / 2, 2.0 / 2, 1.0);
+	glVertex3d(2.0 / 2, 2.0 / 2, -1.0);
+	glVertex3d(-2.0 / 2, 2.0 / 2, -1.0);
+	// Back
+	glNormal3d(0, 0, 1);
+	glVertex3d(-2.0 / 2, 2.0 / 2, 1.0);
+	glVertex3d(-2.0 / 2, -2.0 / 2, 1.0);
+	glVertex3d(2.0 / 2, -2.0 / 2, 1.0);
+	glVertex3d(2.0 / 2, 2.0 / 2, 1.0);
+	// Front
+	glNormal3d(0, 0, -1);
+	glVertex3d(-2.0 / 2, 2.0 / 2, -1);
+	glVertex3d(2.0 / 2, 2.0 / 2, -1);
+	glVertex3d(2.0 / 2, -2.0 / 2, -1);
+	glVertex3d(-2.0 / 2, -2.0 / 2, -1);
+	// Left
+	glNormal3d(1, 0, 0);
+	glVertex3d(2.0 / 2, 2.0 / 2, -1);
+	glVertex3d(2.0 / 2, 2.0 / 2, 1.0);
+	glVertex3d(2.0 / 2, -2.0 / 2, 1.0);
+	glVertex3d(2.0 / 2, -2.0 / 2, -1);
+	// Right
+	glNormal3d(-1, 0, 0);
+	glVertex3d(-2.0 / 2, 2.0 / 2, 1.0);
+	glVertex3d(-2.0 / 2, 2.0 / 2, -1);
+	glVertex3d(-2.0 / 2, -2.0 / 2, -1);
+	glVertex3d(-2.0 / 2, -2.0 / 2, 1.0);
+	// Bottom
+	glNormal3d(0, -1, 0);
+	glVertex3d(-2.0 / 2, -2.0 / 2, 1.0);
+	glVertex3d(-2.0 / 2, -2.0 / 2, -1);
+	glVertex3d(2.0 / 2, -2.0 / 2, -1);
+	glVertex3d(2.0 / 2, -2.0 / 2, 1.0);
+	glEnd();
+
+	glPopMatrix();
+
 }
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char **argv)
@@ -232,7 +298,7 @@ int main(int argc, char **argv)
 
     // compile a display list of teapot mesh
     // see detail in createTeapotDL()
-    listId = createTeapotDL();
+    //listId = createTeapotDL(); // listId
 
     // the last GLUT call (LOOP)
     // window will be shown and display callback is triggered by events
@@ -566,7 +632,16 @@ void drawObject(){
 
 		timer.start();  //=====================================
 
-		drawTeapot();           // render with vertex array, glDrawElements()
+		
+		drawSquare(0,0,0);          // render with vertex array, glDrawElements()
+		drawSquare(-3, 0, 0);
+		drawSquare(3, 0, 0);
+		drawSquare(0, 3, 0);          // render with vertex array, glDrawElements()
+		drawSquare(-3, 3, 0);
+		drawSquare(3, 3, 0);
+		drawSquare(0, -3, 0);          // render with vertex array, glDrawElements()
+		drawSquare(-3, -3, 0);
+		drawSquare(3, -3, 0);
 	glPopMatrix();
     timer.stop();   //=====================================
 }
@@ -740,14 +815,17 @@ void initHL()
     hlEnable(HL_HAPTIC_CAMERA_VIEW);
 
     // Generate id's for the teapot shape.
-    gTeapotShapeId = hlGenShapes(1);
+    //gTeapotShapeId = hlGenShapes(1);
+	for (int i = 0; i < 9; i++) {
+		gSquareId[i] = hlGenShapes(i);
+		hlAddEventCallback(HL_EVENT_TOUCH, gSquareId[i], HL_CLIENT_THREAD,
+			&touchShapeCallback, NULL);
 
+
+		hlTouchableFace(HL_FRONT_AND_BACK);
+	}
 	 // Setup event callbacks.
-    hlAddEventCallback(HL_EVENT_TOUCH, HL_OBJECT_ANY, HL_CLIENT_THREAD, 
-                       &touchShapeCallback, NULL);
-
-
-    hlTouchableFace(HL_FRONT); // define force feedback from front faces of teapot
+    // define force feedback from front faces of teapot
 }
 
 /*******************************************************************************
@@ -822,27 +900,71 @@ void drawSceneHaptics()
 
     // Start a new haptic shape.  Use the feedback buffer to capture OpenGL 
     // geometry for haptic rendering.
-    hlBeginShape(HL_SHAPE_FEEDBACK_BUFFER, gTeapotShapeId);
+	
+	for (int i = 0; i < 9; i++) {
+		int x = 0;
+		int y = 0;
+		int z = 0;
+		gSquareId[i] = (HLuint)i;
+		hlBeginShape(HL_SHAPE_FEEDBACK_BUFFER, gSquareId[i]);
 
-    // Use OpenGL commands to create geometry.
-       glPushMatrix();
+		// Use OpenGL commands to create geometry.
+		glPushMatrix();
 
-    // tramsform camera
-    glTranslatef(0, 0, cameraDistance);
-    glRotatef(cameraAngleX, 1, 0, 0);   // pitch
-    glRotatef(cameraAngleY, 0, 1, 0);   // heading
+		// tramsform camera
+		glTranslatef(0, 0, cameraDistance);
+		glRotatef(cameraAngleX, 1, 0, 0);   // pitch
+		glRotatef(cameraAngleY, 0, 1, 0);   // heading
 
-    //if(dlUsed)
-    //    glCallList(listId);     // render with display list
-    //else
-        drawTeapot();           // render with vertex array, glDrawElements()
+		//if(dlUsed)
+		//    glCallList(listId);     // render with display list
+		//else
+		if (i == 0) {
+			x = 0; y = 0; z = 0;
+		}
+		else if (i == 1) {
+			x -=3;
+		}
+		else if (i == 2) {
+			x += 3;
+		}
+		else if (i == 3) {
+			y += 3;
+		}
+		else if (i == 4) {
+			x -= 3;
+			y += 3;
+		}
 
-    glPopMatrix();
+		else if (i == 5) {
+			x += 3;
+			y += 3;
+		}
+
+		else if (i == 6) {
+			y -= 3;
+		}
+
+		else if (i == 7) {
+			x -= 3;
+			y -= 3;
+		}
+		else if (i == 8) {
+			x += 3;
+			y -= 3;
+		}
+
+		
+
+		drawSquare(x,y,z);
+
+		glPopMatrix();
 
 
-    // End the shape.
-    hlEndShape();
+		// End the shape.
+		hlEndShape();
 
+	}
     // End the haptic frame.
     hlEndFrame();
 
@@ -963,6 +1085,7 @@ void drawMono(){
                 camera.vu.x,camera.vu.y,camera.vu.z);
 	drawScene();
 }
+
 
 // with 3d stereoscopic view (2 cameras --> stereoscopy with each eye equal to one camera)
 void drawEyeLookAt(){

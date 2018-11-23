@@ -150,6 +150,7 @@
     <ClCompile Include="Timer.cxx" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="square.h" />
     <ClInclude Include="teapot.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>

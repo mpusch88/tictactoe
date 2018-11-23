@@ -1,8 +1,6 @@
-#pragma once
-class square
-{
-public:
-	square();
-	~square();
-};
 
+#pragma once
+//square.h
+
+
+void drawSqaure(float x, float y,float z);
