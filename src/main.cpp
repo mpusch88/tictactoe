@@ -816,7 +816,7 @@ void initHL()
 
     // Generate id's for the teapot shape.
     //gTeapotShapeId = hlGenShapes(1);
-	for (int i = 0; i < 9; i++) {
+	for (int i = 1; i < 10; i++) {
 		gSquareId[i] = hlGenShapes(i);
 		hlAddEventCallback(HL_EVENT_TOUCH, gSquareId[i], HL_CLIENT_THREAD,
 			&touchShapeCallback, NULL);
@@ -901,7 +901,7 @@ void drawSceneHaptics()
     // Start a new haptic shape.  Use the feedback buffer to capture OpenGL 
     // geometry for haptic rendering.
 	
-	for (int i = 0; i < 9; i++) {
+	for (int i = 1; i < 10; i++) {
 		int x = 0;
 		int y = 0;
 		int z = 0;
@@ -919,37 +919,37 @@ void drawSceneHaptics()
 		//if(dlUsed)
 		//    glCallList(listId);     // render with display list
 		//else
-		if (i == 0) {
+		if (i == 1) {
 			x = 0; y = 0; z = 0;
 		}
-		else if (i == 1) {
+		else if (i == 2) {
 			x -=3;
 		}
-		else if (i == 2) {
-			x += 3;
-		}
 		else if (i == 3) {
-			y += 3;
+			x += 3;
 		}
 		else if (i == 4) {
-			x -= 3;
 			y += 3;
 		}
-
 		else if (i == 5) {
-			x += 3;
+			x -= 3;
 			y += 3;
 		}
 
 		else if (i == 6) {
-			y -= 3;
+			x += 3;
+			y += 3;
 		}
 
 		else if (i == 7) {
+			y -= 3;
+		}
+
+		else if (i == 8) {
 			x -= 3;
 			y -= 3;
 		}
-		else if (i == 8) {
+		else if (i == 9) {
 			x += 3;
 			y -= 3;
 		}
