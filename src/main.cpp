@@ -24,6 +24,8 @@ float diffuseColorRed[3] = { 0.929524f, 0.1f, 0.178823f }; // color red - elimin
 float diffuseColorPurple[3] = { 0.3f, 0.53f, 0.54f }; // color purple - eliminate shading
 													  // float specularColor[4] = { 1.00000f, 0.980392f, 0.549020f, 1.0f };
 
+float diffuseColors[9][3];
+bool set[9];
 													  // stereoscopic view parameters begin
 
 typedef struct {
@@ -87,7 +89,6 @@ void idleCB();
 void keyboardCB(unsigned char key, int x, int y);
 void mouseCB(int button, int stat, int x, int y);
 void mouseMotionCB(int x, int y);
-
 void initGL();
 int  initGLUT(int argc, char **argv);
 bool initSharedMem();
@@ -107,8 +108,10 @@ void drawInStereo();
 void drawEyeLookAt();
 void normalise(XYZ *p);
 XYZ crossProduct(XYZ p1, XYZ p2);
-void color();
-void drawSquare(float x, float y, float z);
+void color(int id);
+void drawSquare(float x, float y, float z, int id);
+
+void colorCube();
 
 // haptic code begin
 #ifdef HAPTIC
@@ -122,7 +125,7 @@ void updateWorkspace();
 
 // global variables
 GLuint listId = 0;                      // REMOVE THIS AND REFS!
-
+int count = 0;
 void *font = GLUT_BITMAP_8_BY_13;
 bool mouseLeftDown;
 bool mouseRightDown;
@@ -158,35 +161,39 @@ int stereo = 1; // if stereo=0 rendering mono view
 #ifdef HAPTIC
 void HLCALLBACK touchShapeCallback(HLenum event, HLuint object, HLenum thread,
 	HLcache *cache, void *userdata) {
-
-	touched = !touched;
-	color();
+	if(!set[object])
+		touched = !touched;
+	cout << "object is" << object << endl;
+	color(object);
 }
 #endif
 
-void color() {
-
-	if (!touched) {
-		// purple
-		for (int i = 0; i<colorIndex; i++) {
-			diffuseColor[i] = diffuseColorPurple[i];
+void color(int id) {
+	if (!set[id])
+	{
+		if (!touched) {
+			// purple
+			for (int i = 0; i < colorIndex; i++) {
+				diffuseColors[id - 2][i] = diffuseColorPurple[i];
+			}
 		}
-	}
-	else {
-		// red
-		for (int i = 0; i<colorIndex; i++) {
-			diffuseColor[i] = diffuseColorRed[i];
+		else {
+			// red
+			for (int i = 0; i < colorIndex; i++) {
+				diffuseColors[id - 2][i] = diffuseColorRed[i];
+			}
 		}
+		set[id] = true;
 	}
 }
 
-void drawSquare(float x, float y, float z) {
+void drawSquare(float x, float y, float z, int id) {
 
 	glPushMatrix();
 	//CAVENavTransform();               // ??
 
 	glTranslatef(x, y, z);              // USE PARAMS
-	glColor3fv(diffuseColor);          // SET ME (?)
+	glColor3fv(diffuseColors[id-2]);          // SET ME (?)
 
 	glBegin(GL_QUADS);
 	// Top
@@ -225,6 +232,7 @@ void drawSquare(float x, float y, float z) {
 	glVertex3d(-2.0 / 2, -2.0 / 2, -1);
 	glVertex3d(2.0 / 2, -2.0 / 2, -1);
 	glVertex3d(2.0 / 2, -2.0 / 2, 1.0);
+
 	glEnd();
 	glPopMatrix();
 }
@@ -235,6 +243,10 @@ int main(int argc, char **argv)
 {
 	// initialize global variables
 	initSharedMem();
+	for (int i = 0; i < 9; i++)
+	{
+		set[i] = false;
+	}
 
 	// set initial color of teapot
 	for (int i = 0; i<colorIndex; i++) {
@@ -591,16 +603,19 @@ void drawObject() {
 
 	timer.start();  //=====================================
 
+	// dont mind the 4th number
+	drawSquare(-3, 3, 0, 2);
+	drawSquare(0, 3, 0, 3);
+	drawSquare(3, 3, 0, 4);
+	drawSquare(-3, 0, 0, 5);
+	drawSquare(0, 0, 0, 6);
+	drawSquare(3, 0, 0, 7);
+	drawSquare(-3, -3, 0, 8);
+	drawSquare(0, -3, 0,9);
+	drawSquare(3, -3, 0,10);
 
-	drawSquare(0, 0, 0);          // render with vertex array, glDrawElements()
-	drawSquare(-3, 0, 0);
-	drawSquare(3, 0, 0);
-	drawSquare(0, 3, 0);          // render with vertex array, glDrawElements()
-	drawSquare(-3, 3, 0);
-	drawSquare(3, 3, 0);
-	drawSquare(0, -3, 0);          // render with vertex array, glDrawElements()
-	drawSquare(-3, -3, 0);
-	drawSquare(3, -3, 0);
+	count++;
+
 	glPopMatrix();
 	timer.stop();   //=====================================
 }
@@ -685,11 +700,11 @@ void keyboardCB(unsigned char key, int x, int y)
 	case ' ': // switch rendering modes (fill -> wire -> point)
 		stereoMethod = !stereoMethod;
 		break;
-	case 'c':
-	case 'C':
-		touched = !touched;
-		color();
-		break;
+//	case 'c':
+//	case 'C':
+//		touched = !touched;
+//		color();
+//		break;
 
 	default:
 		;
@@ -770,10 +785,11 @@ void initHL()
 	// Generate id's for the teapot shape.
 	//gTeapotShapeId = hlGenShapes(1);
 	for (int i = 0; i < 9; i++) {
-		gSquareId[i] = hlGenShapes(i+1);
+		gSquareId[i] = hlGenShapes(1);
 		hlAddEventCallback(HL_EVENT_TOUCH, gSquareId[i], HL_CLIENT_THREAD,
 			&touchShapeCallback, NULL);
 
+		cout << "Initialized cube " << i << endl;
 		//hlTouchableFace(HL_FRONT);
 	}
 
@@ -878,10 +894,13 @@ void drawSceneHaptics()
 
 	// End the shape.
 	//	hlEndShape();
-	for (int i = 0; i < 9; i++) {
+
+	for (int i = 0; i < 9; i++) 
+	{
 		int x = 0;
 		int y = 0;
 		int z = 0;
+
 		//gSquareId[i] = (HLuint)i;
 		hlBeginShape(HL_SHAPE_FEEDBACK_BUFFER, gSquareId[i]);
 
@@ -897,51 +916,53 @@ void drawSceneHaptics()
 											//    glCallList(listId);     // render with display list
 											//else
 		if (i == 0) {
-			x = 0; y = 0; z = 0;
+			x -= 3;
+			y += 3;
 		}
 		else if (i == 1) {
-			x -= 3;
+			y += 3;
 		}
 		else if (i == 2) {
+
 			x += 3;
+			y += 3;
 		}
 		else if (i == 3) {
-			y += 3;
+			x -= 3;
+
 		}
 		else if (i == 4) {
-			x -= 3;
-			y += 3;
+			x = 0;
+			y = 0;
 		}
 
 		else if (i == 5) {
 			x += 3;
-			y += 3;
+
 		}
 
 		else if (i == 6) {
+			x -= 3;
 			y -= 3;
+
 		}
 
 		else if (i == 7) {
-			x -= 3;
 			y -= 3;
 		}
+
 		else if (i == 8) {
-			x += 3;
-			y -= 3;
+			x = 3; 
+			y = -3;
 		}
 
-
-
-		drawSquare(x, y, z);
-
+		drawSquare(x, y, z, gSquareId[i]);
 		glPopMatrix();
-
 
 		// End the shape.
 		hlEndShape();
-
 	}
+
 	// End the haptic frame.
 	hlEndFrame();
 

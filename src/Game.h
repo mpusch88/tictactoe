@@ -1,19 +1,19 @@
 #pragma once
+#include "Player.h"
 
+/*
 /**
 * A Board used to play Tic Tac Toe
 *
 * @author Carlos Hernandez Rosas
 *
-*/
-#ifndef BOARD_H
-#define BOARD_H
-class Board {
+*
+class Game {
 private:
-	char theBoard[3][3];
-	int markCount;
+	Player p1;
+    Player p2;
 public:
-	Board();
+	Game();
 
 	char getMark(int row, int col);
 
@@ -30,4 +30,4 @@ public:
 	int checkWinner(char mark);
 
 };
-#endif
+*/

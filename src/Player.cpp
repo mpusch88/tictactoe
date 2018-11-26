@@ -9,8 +9,7 @@ using namespace std;
 * @param n name of the player
 * @param m mark of the player
 */
-Player::Player(string n, char m) {
-	name = n;
+Player::Player(char m) {
 	mark = m;
 }
 

@@ -11,9 +11,10 @@ using namespace std;
 * @author Carlos Hernandez Rosas
 *
 */
+#ifndef PLAYER_H
+#define PLAYER_H
 class Player {
 private:
-	string name;
 
 	char mark;
 
@@ -22,7 +23,7 @@ private:
 	Board board;
 
 public:
-	Player(string n, char m);
+	Player(char m);
 
 	void setOpponent(Player *op);
 
@@ -35,3 +36,4 @@ public:
 	bool isValid(int row, int col);
 
 };
+#endif
