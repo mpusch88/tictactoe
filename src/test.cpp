@@ -6,9 +6,9 @@
 //
 //  AUTHOR: Song Ho Ahn (song.ahn@gmail.com)
 // CREATED: 2005-10-04
-//
-// UPDATED: 2016-08-25  (Y. Hu: Microsoft Visual Studio 2015 + Platform toolset in Visual Studio 2015; OpenHatics-V3.2.2; System configuration - Windows 7 + 16:9 screen ratio)
-// UPDATED: 2018-08-02  (Y. Hu: Microsoft Visual Studio 2017 + Platform toolset in Visual Studio 2017; OpenHatics-V3.2.2; System configuration - Windows 7 + 16:9 screen ratio)
+// 
+// UPDATED: 2016-08-25  (Y. Hu: Microsoft Visual Studio 2015 + Platform toolset in Visual Studio 2015; OpenHatics-V3.2.2; System configuration - Windows 7 + 16:9 screen ratio) 
+// UPDATED: 2018-08-02  (Y. Hu: Microsoft Visual Studio 2017 + Platform toolset in Visual Studio 2017; OpenHatics-V3.2.2; System configuration - Windows 7 + 16:9 screen ratio) 
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -19,12 +19,12 @@
 #include <GL/glut.h>
 
 // Colours from teapot.h
-float diffuseColor[3] = { 0.929524f, 0.796542f, 0.178823f }; // color yellow original
-float diffuseColorRed[3] = { 0.929524f, 0.1f, 0.178823f }; // color red - eliminate shading
-float diffuseColorPurple[3] = { 0.3f, 0.53f, 0.54f }; // color purple - eliminate shading
-													  // float specularColor[4] = { 1.00000f, 0.980392f, 0.549020f, 1.0f };
+// float diffuseColor[3] = { 0.929524f, 0.796542f, 0.178823f }; // color yellow original
+// float diffuseColorRed[3] = { 0.929524f, 0.1f, 0.178823f }; // color red - eliminate shading
+// float diffuseColorPurple[3] = { 0.3f, 0.53f, 0.54f }; // color purple - eliminate shading
+// float specularColor[4] = { 1.00000f, 0.980392f, 0.549020f, 1.0f };
 
-													  // stereoscopic view parameters begin
+// stereoscopic view parameters begin
 
 typedef struct {
 	double x, y, z;
@@ -140,7 +140,7 @@ float foview = 60.;
 float nNear = 1.;
 float nFar = 15.;
 float frustumTop = nNear*tan(foview*3.14159 / 360);
-float frustumRight = frustumTop*ratio; //top
+float frustumRight = frustumTop*ratio; //top 
 
 									   // frustum parameters for 2 cameras --> stereoscopy with each eye equal to one camera
 float left;
@@ -152,7 +152,7 @@ float farP = 40;
 
 int colorIndex = 3; // 3 colors - red, green, blue
 bool touched; // haptic code
-int stereo = 1; // if stereo=0 rendering mono view
+int stereo = 1; // if stereo=0 rendering mono view 
 
 				// haptic callback
 #ifdef HAPTIC
@@ -186,7 +186,7 @@ void drawSquare(float x, float y, float z) {
 	//CAVENavTransform();               // ??
 
 	glTranslatef(x, y, z);              // USE PARAMS
-	glColor3fv(diffuseColor);          // SET ME (?)
+	glColor3f(0.7, 0.7, 0.99);          // SET ME (?)
 
 	glBegin(GL_QUADS);
 	// Top
@@ -229,7 +229,7 @@ void drawSquare(float x, float y, float z) {
 	glPopMatrix();
 }
 
-//************************************************************************************
+************************************************************************************
 
 int main(int argc, char **argv)
 {
@@ -769,19 +769,16 @@ void initHL()
 
 	// Generate id's for the teapot shape.
 	//gTeapotShapeId = hlGenShapes(1);
-	for (int i = 0; i < 9; i++) {
-		gSquareId[i] = hlGenShapes(i+1);
+	for (int i = 1; i < 10; i++) {
+		gSquareId[i] = hlGenShapes(i);
 		hlAddEventCallback(HL_EVENT_TOUCH, gSquareId[i], HL_CLIENT_THREAD,
 			&touchShapeCallback, NULL);
 
-		//hlTouchableFace(HL_FRONT);
+
+		hlTouchableFace(HL_FRONT_AND_BACK);
 	}
-
 	// Setup event callbacks.
-	//hlAddEventCallback(HL_EVENT_TOUCH, gSquareId[0], HL_CLIENT_THREAD,
-	//&touchShapeCallback, NULL);
-
- // define force feedback from front faces of teapot
+	// define force feedback from front faces of teapot
 }
 
 /*******************************************************************************
@@ -856,33 +853,12 @@ void drawSceneHaptics()
 
 	// Start a new haptic shape.  Use the feedback buffer to capture OpenGL 
 	// geometry for haptic rendering.
-	//	hlBeginShape(HL_SHAPE_FEEDBACK_BUFFER, gTeapotShapeId);
 
-	// Use OpenGL commands to create geometry.
-	//	glPushMatrix();
-
-	// tramsform camera
-	//	glTranslatef(0, 0, cameraDistance);
-	//	glRotatef(cameraAngleX, 1, 0, 0);   // pitch
-	//	glRotatef(cameraAngleY, 0, 1, 0);   // heading
-
-	//if(dlUsed)
-	//    glCallList(listId);     // render with display list
-	//else
-	//drawTeapot();           // render with vertex array, glDrawElements()
-
-
-
-	//	glPopMatrix();
-
-
-	// End the shape.
-	//	hlEndShape();
-	for (int i = 0; i < 9; i++) {
+	for (int i = 1; i < 10; i++) {
 		int x = 0;
 		int y = 0;
 		int z = 0;
-		//gSquareId[i] = (HLuint)i;
+		gSquareId[i] = (HLuint)i;
 		hlBeginShape(HL_SHAPE_FEEDBACK_BUFFER, gSquareId[i]);
 
 		// Use OpenGL commands to create geometry.
@@ -896,37 +872,37 @@ void drawSceneHaptics()
 											//if(dlUsed)
 											//    glCallList(listId);     // render with display list
 											//else
-		if (i == 0) {
+		if (i == 1) {
 			x = 0; y = 0; z = 0;
 		}
-		else if (i == 1) {
-			x -= 3;
-		}
 		else if (i == 2) {
-			x += 3;
+			x -= 3;
 		}
 		else if (i == 3) {
-			y += 3;
+			x += 3;
 		}
 		else if (i == 4) {
-			x -= 3;
 			y += 3;
 		}
-
 		else if (i == 5) {
-			x += 3;
+			x -= 3;
 			y += 3;
 		}
 
 		else if (i == 6) {
-			y -= 3;
+			x += 3;
+			y += 3;
 		}
 
 		else if (i == 7) {
+			y -= 3;
+		}
+
+		else if (i == 8) {
 			x -= 3;
 			y -= 3;
 		}
-		else if (i == 8) {
+		else if (i == 9) {
 			x += 3;
 			y -= 3;
 		}
@@ -947,8 +923,6 @@ void drawSceneHaptics()
 
 	// Call any event callbacks that have been triggered.
 	hlCheckEvents();
-
-
 }
 
 /*******************************************************************************
