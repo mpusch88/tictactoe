@@ -65,7 +65,7 @@ int Board::checkWinner(char mark) {
 		if (col_result != 0)
 			result = 1;
 	}
-	
+
 	if (result == 0) {
 		int diag1Result = 1;
 		for (row = 0; diag1Result != 0 && row < 3; row++)

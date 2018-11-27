@@ -4,6 +4,15 @@
 
 using namespace std;
 
+static bool selected;
+
+static int choice;
+
+
+Player::Player() {
+	selected = false;
+	choice = -1;
+}
 /**
 * Constructs a Player with a name and a mark
 * @param n name of the player
@@ -11,6 +20,8 @@ using namespace std;
 */
 Player::Player(char m) {
 	mark = m;
+	selected = false;
+	choice = -1;
 }
 
 /**
@@ -38,7 +49,9 @@ void Player::setBoard(Board b) {
 void Player::makeMove() {
 	int row, col;
 	do {
-		//TODO Receive the selection 
+		while (!selected);
+		selection(choice, row, col);
+		choice = -1;
 	} while (!isValid(row, col));
 	board.addMark(row, col, mark);
 }
@@ -79,4 +92,14 @@ bool Player::isValid(int row, int col) {
 		return true;
 	}
 	return false;
+}
+
+void Player::makeSelection(int c) {
+	selected = true;
+	choice = c;
+}
+
+void Player::selection(int choice, int &row, int &col) {
+	row = choice / 3;
+	col = choice % 3;
 }

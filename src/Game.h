@@ -1,33 +1,22 @@
 #pragma once
 #include "Player.h"
 
-/*
 /**
 * A Board used to play Tic Tac Toe
 *
 * @author Carlos Hernandez Rosas
 *
-*
+*/
 class Game {
 private:
 	Player p1;
-    Player p2;
+	Player p2;
+	Board board;
 public:
 	Game();
 
-	char getMark(int row, int col);
+	void runGame();
 
-	bool isFull();
-
-	bool xWins();
-
-	bool oWins();
-
-	void addMark(int row, int col, char mark);
-
-	void clear();
-
-	int checkWinner(char mark);
+	void updateBoard(int spot);
 
 };
-*/

@@ -23,6 +23,7 @@ private:
 	Board board;
 
 public:
+	Player();
 	Player(char m);
 
 	void setOpponent(Player *op);
@@ -34,6 +35,10 @@ public:
 	void play();
 
 	bool isValid(int row, int col);
+
+	void selection(int choice, int &row, int &col);
+
+	static void makeSelection(int choice);
 
 };
 #endif
