@@ -1,17 +1,11 @@
-#include <string>
+#include <iostream>
 #include "Player.h"
 #include "Board.h"
 
 using namespace std;
 
-static bool selected;
-
-static int choice;
-
 
 Player::Player() {
-	selected = false;
-	choice = -1;
 }
 /**
 * Constructs a Player with a name and a mark
@@ -20,23 +14,22 @@ Player::Player() {
 */
 Player::Player(char m) {
 	mark = m;
-	selected = false;
-	choice = -1;
 }
+
 
 /**
 * Sets up the opponent of the player
 * @param op opponent
 */
-void Player::setOpponent(Player* op) {
-	opponent = op;
+void Player::setOpponent(Player &op) {
+	opponent = &op;
 }
 
 /**
 * Sets up the board the player will play on
 * @param b board
 */
-void Player::setBoard(Board b) {
+void Player::setBoard(Board* b) {
 	board = b;
 }
 
@@ -46,14 +39,13 @@ void Player::setBoard(Board b) {
 * or just not in the table, the player will be prompted to enter
 * a valid row and column
 */
-void Player::makeMove() {
+void Player::makeMove(int choice) {
 	int row, col;
-	do {
-		while (!selected);
-		selection(choice, row, col);
-		choice = -1;
-	} while (!isValid(row, col));
-	board.addMark(row, col, mark);
+	row = choice / 3;
+	col = choice % 3;
+	if (isValid(row, col)) {
+		board->addMark(row, col, mark);
+	}
 }
 
 /**
@@ -61,22 +53,23 @@ void Player::makeMove() {
 * or the board has been filled. It will then announce the outcome
 * of the game.
 */
-void Player::play() {
-	while (!board.xWins() && !board.oWins() && !board.isFull()) {
-		makeMove();
-		if (board.xWins() || board.isFull()) {
-			break;
-		}
-		opponent->makeMove();
+void Player::play(int choice) {
+	cout << "Started play by '" << mark << "'\n";
+	if (!board->xWins() && !board->oWins() && !board->isFull()) {
+		makeMove(choice);
 	}
-	if (board.xWins()) {
+	if (board->xWins()) {
+		cout << "board at 0 '" << board->getMark(0, 0) << "'\n";
 		// This player wins
+		cout << "P1 WINS\n";
 	}
-	else if (board.oWins()) {
+	else if (board->oWins()) {
 		// opponent wins
+		cout << "P2 WINS\n";
 	}
-	else {
+	else if(board->isFull()){
 		// draw
+		cout << "DRAW\n";
 	}
 }
 
@@ -88,18 +81,21 @@ void Player::play() {
 * @return true if the spot is valid, false otherwise
 */
 bool Player::isValid(int row, int col) {
-	if (row >= 0 && row <= 2 && col >= 0 && col <= 2 && board.getMark(row, col) == ' ') {
+	if (row >= 0 && row <= 2 && col >= 0 && col <= 2 && board->getMark(row, col) == ' ') {
 		return true;
 	}
 	return false;
 }
 
-void Player::makeSelection(int c) {
-	selected = true;
-	choice = c;
-}
-
 void Player::selection(int choice, int &row, int &col) {
 	row = choice / 3;
 	col = choice % 3;
+}
+
+Player* Player::getOpponent() {
+	return opponent;
+}
+
+char Player::getMark() {
+	return mark;
 }

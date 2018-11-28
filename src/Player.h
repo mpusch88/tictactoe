@@ -18,27 +18,31 @@ private:
 
 	char mark;
 
-	Player* opponent;
+	Player *opponent;
 
-	Board board;
+	Board *board;
 
 public:
+
 	Player();
+
 	Player(char m);
 
-	void setOpponent(Player *op);
+	void setOpponent(Player &op);
 
-	void setBoard(Board b);
+	void setBoard(Board *b);
 
-	void makeMove();
+	void makeMove(int choice);
 
-	void play();
+	void play(int choice);
 
 	bool isValid(int row, int col);
-
+	
 	void selection(int choice, int &row, int &col);
 
-	static void makeSelection(int choice);
+	Player* getOpponent();
+
+	char getMark();
 
 };
 #endif
