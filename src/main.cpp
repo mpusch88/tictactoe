@@ -17,22 +17,22 @@
 #include <iomanip>
 #include "Timer.h"
 #include <GL/glut.h>
-
 #include "Game.h"
 
-// Colours from teapot.h
-float diffuseColor[3] = { 0.929524f, 0.796542f, 0.178823f }; // color yellow original
-float diffuseColorRed[3] = { 0.929524f, 0.1f, 0.178823f }; // color red - eliminate shading
-float diffuseColorPurple[3] = { 0.3f, 0.53f, 0.54f }; // color purple - eliminate shading
-													  // float specularColor[4] = { 1.00000f, 0.980392f, 0.549020f, 1.0f };
+float diffuseColor[3] = { 0.929524f, 0.796542f, 0.178823f };
+float diffuseColorRed[3] = { 0.929524f, 0.1f, 0.178823f };
+float diffuseColorBlue[3] = { 0.3f, 0.53f, 0.54f };
 
+// float specularColor[4] = { 1.00000f, 0.980392f, 0.549020f, 1.0f };
 float diffuseColors[9][3];
 bool set[9];
-													  // stereoscopic view parameters begin
+
+// stereoscopic view parameters begin
 
 typedef struct {
 	double x, y, z;
 } XYZ;
+
 typedef struct {
 	XYZ vp;              /* View position           */
 	XYZ vd;              /* View direction vector   */
@@ -131,8 +131,8 @@ void *font = GLUT_BITMAP_8_BY_13;
 bool mouseLeftDown;
 bool mouseRightDown;
 float mouseX, mouseY;
-float cameraAngleX = 45.0;              // SET ME!
-float cameraAngleY = -145.0;            // SET ME!
+float cameraAngleX = 0;              // SET ME!
+float cameraAngleY = 0;            // SET ME!
 float cameraDistance;
 int drawMode = 0;
 Timer timer;
@@ -162,11 +162,11 @@ int stereo = 1; // if stereo=0 rendering mono view
 #ifdef HAPTIC
 void HLCALLBACK touchShapeCallback(HLenum event, HLuint object, HLenum thread,
 	HLcache *cache, void *userdata) {
-	if (!set[object-2]) {
+	if (!set[object - 2]) {
 		touched = !touched;
 		game.updateBoard(object - 2);
 		game.updatePlayer();
-		
+
 	}
 	//game.updateBoard(object - 2);
 	cout << "object is" << object << endl;
@@ -175,12 +175,12 @@ void HLCALLBACK touchShapeCallback(HLenum event, HLuint object, HLenum thread,
 #endif
 
 void color(int id) {
-	if (!set[id-2])
+	if (!set[id - 2])
 	{
 		if (!touched) {
 			// purple
 			for (int i = 0; i < colorIndex; i++) {
-				diffuseColors[id - 2][i] = diffuseColorPurple[i];
+				diffuseColors[id - 2][i] = diffuseColorBlue[i];
 			}
 		}
 		else {
@@ -189,7 +189,7 @@ void color(int id) {
 				diffuseColors[id - 2][i] = diffuseColorRed[i];
 			}
 		}
-		set[id-2] = true;
+		set[id - 2] = true;
 	}
 }
 
@@ -199,7 +199,7 @@ void drawSquare(float x, float y, float z, int id) {
 	//CAVENavTransform();               // ??
 
 	glTranslatef(x, y, z);              // USE PARAMS
-	glColor3fv(diffuseColors[id-2]);          // SET ME (?)
+	glColor3fv(diffuseColors[id - 2]);          // SET ME (?)
 
 	glBegin(GL_QUADS);
 	// Top
@@ -274,7 +274,7 @@ int main(int argc, char **argv)
 											 // position of the camera
 	camera.vp.x = 0;
 	camera.vp.y = 0;
-	camera.vp.z = 10;
+	camera.vp.z = 12;
 
 	//view direction vector
 	camera.vd.x = 0;
@@ -483,46 +483,70 @@ void showInfo()
 	glLoadIdentity();                   // reset modelview matrix
 
 										// set to 2D orthogonal projection
-	glMatrixMode(GL_PROJECTION);     // switch to projection matrix
-	glPushMatrix();                  // save current projection matrix
-	glLoadIdentity();                // reset projection matrix
-	gluOrtho2D(0, 400, 0, 300);  // set to orthogonal projection
+	glMatrixMode(GL_PROJECTION);		// switch to projection matrix
+	glPushMatrix();						// save current projection matrix
+	glLoadIdentity();					// reset projection matrix
+	gluOrtho2D(0, 400, 0, 300);			// set to orthogonal projection
 
 	float color[4] = { 1, 1, 1, 1 };
 
 	stringstream ss;
 	ss << std::fixed << std::setprecision(3);
 
-	ss << "Stereo Mode: " << (stereoMethod ? "one camera - 2 frustums --> stereoscopy with each eye equal to one frustrum" : "2 cameras --> stereoscopy with each eye equal to one camera") << ends;
-	drawString(ss.str().c_str(), 1, 286, color, font);
-	ss.str("");
+	//ss << "Stereo Mode: " << (stereoMethod ? "one camera - 2 frustums --> stereoscopy with each eye equal to one frustrum" : "2 cameras --> stereoscopy with each eye equal to one camera") << ends;
+	//drawString(ss.str().c_str(), 1, 286, color, font);
+	//ss.str("");
 
-	// display elapsed time in millisec
-	ss << "Time: " << timer.getElapsedTimeInMilliSec() << " ms" << ends;
-	drawString(ss.str().c_str(), 1, 272, color, font);
-	ss.str("");
+	if (game.getStatus())
+	{
+		if (game.getWinner() != NULL) {
 
-#ifdef HAPTIC
-	HLdouble proxyPos[3];
-	hlGetDoublev(HL_PROXY_POSITION, proxyPos);
+			if (game.getWinner()->getMark() == 'O') {
+				ss << "Green Wins!!!!" << ends;
+				drawString(ss.str().c_str(), 1, 166, color, font);
+				ss.str("");
 
-	ss << "haptic: " << proxyPos[0] << ", " << proxyPos[1] << ", " << proxyPos[2] << ends;
-	drawString(ss.str().c_str(), 1, 258, color, font);
-	ss.str("");
-#endif
+				ss << "Press 'r' to restart!" << ends;
+				drawString(ss.str().c_str(), 1, 155, color, font);
+				ss.str("");
+			}
 
-	ss << "camera X: " << cameraAngleX << ends;
-	drawString(ss.str().c_str(), 1, 244, color, font);
-	ss.str("");
+			else {
+				ss << "Red Wins!!!!" << ends;
+				drawString(ss.str().c_str(), 1, 166, color, font);
+				ss.str("");
 
-	ss << "camera Y: " << cameraAngleY << ends;
-	drawString(ss.str().c_str(), 1, 230, color, font);
-	ss.str("");
+				ss << "Press 'r' to restart!" << ends;
+				drawString(ss.str().c_str(), 1, 155, color, font);
+				ss.str("");
+			}
+		}
 
-	float cameraObject = abs(cameraDistance - 10);
-	ss << "camera-object distance: " << cameraObject << ends;
-	drawString(ss.str().c_str(), 1, 216, color, font);
-	ss.str("");
+		else {
+			ss << " DRAW!!!!" << ends;
+			drawString(ss.str().c_str(), 1, 166, color, font);
+			ss.str("");
+
+			ss << "Press 'r' to restart!" << ends;
+			drawString(ss.str().c_str(), 1, 155, color, font);
+			ss.str("");
+		}
+	}
+	else
+	{
+		if (game.getPlayer()->getMark() == 'O')
+		{
+			ss << "Current player: Green" << ends;
+			drawString(ss.str().c_str(), 1, 286, color, font);
+			ss.str("");
+		}
+		else
+		{
+			ss << "Current player: Red" << ends;
+			drawString(ss.str().c_str(), 1, 286, color, font);
+			ss.str("");
+		}
+	}
 
 	ss << "Press SPACE key to toggle stereo mode." << ends;
 	drawString(ss.str().c_str(), 1, 1, color, font);
@@ -613,7 +637,7 @@ void drawObject() {
 
 	timer.start();  //=====================================
 
-	// dont mind the 4th number
+					// dont mind the 4th number
 	drawSquare(-3, 3, 0, 2);
 	drawSquare(0, 3, 0, 3);
 	drawSquare(3, 3, 0, 4);
@@ -621,8 +645,8 @@ void drawObject() {
 	drawSquare(0, 0, 0, 6);
 	drawSquare(3, 0, 0, 7);
 	drawSquare(-3, -3, 0, 8);
-	drawSquare(0, -3, 0,9);
-	drawSquare(3, -3, 0,10);
+	drawSquare(0, -3, 0, 9);
+	drawSquare(3, -3, 0, 10);
 
 	//countt++;
 
@@ -699,6 +723,7 @@ void keyboardCB(unsigned char key, int x, int y)
 			glDisable(GL_DEPTH_TEST);
 			glDisable(GL_CULL_FACE);
 		}
+
 		else                    // point mode
 		{
 			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
@@ -713,7 +738,7 @@ void keyboardCB(unsigned char key, int x, int y)
 	case 'r':
 	case 'R':
 		game.reset();
-		cout << "R: P1 '" << game.currentPlayer->getMark() << "' and opponent '" << game.currentPlayer->getOpponent()->getMark() <<  "'\n";
+		cout << "R: P1 '" << game.getPlayer()->getMark() << "' and opponent '" << game.getPlayer()->getOpponent()->getMark() << "'\n";
 
 
 		for (int i = 0; i < 9; i++) {
@@ -815,7 +840,7 @@ void initHL()
 	//hlAddEventCallback(HL_EVENT_TOUCH, gSquareId[0], HL_CLIENT_THREAD,
 	//&touchShapeCallback, NULL);
 
- // define force feedback from front faces of teapot
+	// define force feedback from front faces of teapot
 }
 
 /*******************************************************************************
@@ -888,32 +913,7 @@ void drawSceneHaptics()
 	hlMaterialf(HL_FRONT_AND_BACK, HL_STATIC_FRICTION, 0.2f);
 	hlMaterialf(HL_FRONT_AND_BACK, HL_DYNAMIC_FRICTION, 0.3f);
 
-	// Start a new haptic shape.  Use the feedback buffer to capture OpenGL 
-	// geometry for haptic rendering.
-	//	hlBeginShape(HL_SHAPE_FEEDBACK_BUFFER, gTeapotShapeId);
-
-	// Use OpenGL commands to create geometry.
-	//	glPushMatrix();
-
-	// tramsform camera
-	//	glTranslatef(0, 0, cameraDistance);
-	//	glRotatef(cameraAngleX, 1, 0, 0);   // pitch
-	//	glRotatef(cameraAngleY, 0, 1, 0);   // heading
-
-	//if(dlUsed)
-	//    glCallList(listId);     // render with display list
-	//else
-	//drawTeapot();           // render with vertex array, glDrawElements()
-
-
-
-	//	glPopMatrix();
-
-
-	// End the shape.
-	//	hlEndShape();
-
-	for (int i = 0; i < 9; i++) 
+	for (int i = 0; i < 9; i++)
 	{
 		int x = 0;
 		int y = 0;
@@ -970,7 +970,7 @@ void drawSceneHaptics()
 		}
 
 		else if (i == 8) {
-			x = 3; 
+			x = 3;
 			y = -3;
 		}
 
@@ -1154,11 +1154,7 @@ void drawEyeLookAt() {
 	bottom = -wd2;
 
 	glFrustum(leftt, rightt, bottom, top, nearP, farP);
-
 	glMatrixMode(GL_MODELVIEW);
-
-	//glDrawBuffer(GL_BACK_LEFT);
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity();
 	gluLookAt(camera.vp.x - r.x, camera.vp.y - r.y, camera.vp.z - r.z,
@@ -1166,45 +1162,46 @@ void drawEyeLookAt() {
 		camera.vp.y - r.y + camera.vd.y,
 		camera.vp.z - r.z + camera.vd.z,
 		camera.vu.x, camera.vu.y, camera.vu.z);
-
 	drawScene();
 	glFlush();
-
-	//glutSwapBuffers();   // exchange the scenes of right and left eyes
 }
 
-void drawScene() {
-
+void drawScene()
+{
 	drawObject();
 
 #ifdef HAPTIC
+
 	drawHapticCursor();
+
 #endif
 
 	showInfo();
 	showFPS();
 }
 
-void normalise(XYZ *p) {
-
+void normalise(XYZ *p)
+{
 	double length;
 	length = sqrt(p->x * p->x + p->y * p->y + p->z * p->z);
 
-	if (length != 0) {
+	if (length != 0)
+	{
 		p->x /= length;
 		p->y /= length;
 		p->z /= length;
 	}
 
-	else {
+	else
+	{
 		p->x = 0;
 		p->y = 0;
 		p->z = 0;
 	}
 }
 
-XYZ crossProduct(XYZ p1, XYZ p2) {
-
+XYZ crossProduct(XYZ p1, XYZ p2)
+{
 	XYZ p3;
 
 	p3.x = p1.y*p2.z - p1.z*p2.y;

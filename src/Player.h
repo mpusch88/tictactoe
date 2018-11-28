@@ -22,6 +22,7 @@ private:
 
 	Board *board;
 
+	
 public:
 
 	Player();
@@ -44,5 +45,8 @@ public:
 
 	char getMark();
 
+	
+
+	
 };
 #endif

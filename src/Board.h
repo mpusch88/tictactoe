@@ -21,6 +21,7 @@ public:
 
 	bool oWins();
 
+	
 	void addMark(int row, int col, char mark);
 
 	void clear();

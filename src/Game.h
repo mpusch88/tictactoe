@@ -13,17 +13,19 @@ private:
 	Player p1;
     Player p2;
 	Player* currentPlayer;
+	Player *winner;
 	Board* board;
 	Board b;
+	bool gameOver;
+	
 public:
 	Game();
-
-	void setGame();
-
+	Player* getPlayer();
 	void updateBoard(int spot);
-
 	void updatePlayer();
-
 	void reset();
-
+	bool getStatus();
+	Board getBoard();
+	void setWinner();
+	Player* getWinner();
 };

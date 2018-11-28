@@ -14,6 +14,7 @@ Player::Player() {
 */
 Player::Player(char m) {
 	mark = m;
+	
 }
 
 
@@ -62,14 +63,18 @@ void Player::play(int choice) {
 		cout << "board at 0 '" << board->getMark(0, 0) << "'\n";
 		// This player wins
 		cout << "P1 WINS\n";
+		
+		
 	}
 	else if (board->oWins()) {
 		// opponent wins
 		cout << "P2 WINS\n";
+		
 	}
 	else if(board->isFull()){
 		// draw
 		cout << "DRAW\n";
+		
 	}
 }
 
