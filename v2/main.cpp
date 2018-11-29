@@ -117,6 +117,7 @@ float diffuseColorGreen[3] = { 0.3f, 0.53f, 0.54f };
 float diffuseColors[9][3];
 Timer timer;
 Game game;
+bool gameOver = false;
 char moveList[9];
 bool set[9];
 bool square[9];
@@ -166,10 +167,10 @@ int stereo = 1;
 				square[object - 2] = false;
 
 			}
+			color(object);
 		}
 
 		cout << "object is" << object << endl;
-		color(object);
 	}
 
 #endif
@@ -219,14 +220,118 @@ void drawX(float x, float y, float z, int id)
 	glLineWidth(255);
 	glColor3fv(diffuseColors[id - 2]);
 
-	glBegin(GL_LINES);
-	glVertex3d(-1, 1, 0);
-	glVertex3d(1, -1, 0);
+	glBegin(GL_POLYGON);
+	glVertex3d(0.0, 0.2,1.0);
+	glVertex3d(-0.8, 1.0, 1.0);
+	glVertex3d(-1.0, 0.8, 1.0);
+	glVertex3d(-0.2, 0.0, 1.0);
+	glVertex3d(-1.0, -0.8, 1.0);
+	glVertex3d(-0.8, -1.0, 1.0);
+	glVertex3d(0.0, -0.2, 1.0);
+	glVertex3d(0.8, -1.0, 1.0);
+	glVertex3d(1.0, -0.8, 1.0);
+	glVertex3d(0.2, 0.0, 1.0);
+	glVertex3d(1.0, 0.8, 1.0);
+	glVertex3d(0.8, 1.0, 1.0);
 	glEnd();
 
-	glBegin(GL_LINES);
-	glVertex3d(1, 1, 0);
-	glVertex3d(-1, -1, 0);
+	glBegin(GL_POLYGON);
+	glVertex3d(0.0, 0.2, -1.0);
+	glVertex3d(0.8, 1.0, -1.0);
+	glVertex3d(1.0, 0.8, -1.0);
+	glVertex3d(0.2, 0.0, -1.0);
+	glVertex3d(1.0, -0.8, -1.0);
+	glVertex3d(0.8, -1.0, -1.0);
+	glVertex3d(0.0, -0.2, -1.0);
+	glVertex3d(-0.8, -1.0, -1.0);
+	glVertex3d(-1.0, -0.8, -1.0);
+	glVertex3d(-0.2, 0.0, -1.0);
+	glVertex3d(-1.0, 0.8, -1.0);
+	glVertex3d(-0.8, 1.0, -1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(0.0, 0.2, 1.0);
+	glVertex3d(0.0, 0.2, -1.0);
+	glVertex3d(-0.8, 1.0, -1.0);
+	glVertex3d(-0.8, 1.0, 1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(0.0, 0.2, 1.0);
+	glVertex3d(0.8, 1.0, 1.0);
+	glVertex3d(0.8, 1.0, -1.0);
+	glVertex3d(0.0, 0.2, -1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(0.2, 0.0, 1.0);
+	glVertex3d(0.2, 0.0, -1.0);
+	glVertex3d(1.0, 0.8, -1.0);
+	glVertex3d(1.0, 0.8, 1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(-0.2, 0.0, 1.0);
+	glVertex3d(-1.0, 0.8, 1.0);
+	glVertex3d(-1.0, 0.8, -1.0);
+	glVertex3d(-0.2, 0.0, -1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(0.0, -0.2, 1.0);
+	glVertex3d(-0.8, -1.0, 1.0);
+	glVertex3d(-0.8, -1.0, -1.0);
+	glVertex3d(0.0, -0.2, -1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(0.0, -0.2, 1.0);
+	glVertex3d(0.0, -0.2, -1.0);
+	glVertex3d(0.8, -1.0, -1.0);
+	glVertex3d(0.8, -1.0, 1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(0.2, -0.0, 1.0);
+	glVertex3d(1.0, -0.8, 1.0);
+	glVertex3d(1.0, -0.8, -1.0);
+	glVertex3d(0.2, -0.0, -1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(-0.2, -0.0, 1.0);
+	glVertex3d(-0.2, -0.0, -1.0);
+	glVertex3d(-1.0, -0.8, -1.0);
+	glVertex3d(-1.0, -0.8, 1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(0.8, 1.0, 1.0);
+	glVertex3d(1.0, 0.8, 1.0);
+	glVertex3d(1.0, 0.8, -1.0);
+	glVertex3d(0.8, 1.0, -1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(-0.8, 1.0, 1.0);
+	glVertex3d(-0.8, 1.0, -1.0);
+	glVertex3d(-1.0, 0.8, -1.0);
+	glVertex3d(-1.0, 0.8, 1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(-0.8, -1.0, 1.0);
+	glVertex3d(-1.0, -0.8, 1.0);
+	glVertex3d(-1.0, -0.8, -1.0);
+	glVertex3d(-0.8, -1.0, -1.0);
+	glEnd();
+
+	glBegin(GL_POLYGON);
+	glVertex3d(0.8, -1.0, 1.0);
+	glVertex3d(0.8, -1.0, -1.0);
+	glVertex3d(1.0, -0.8, -1.0);
+	glVertex3d(1.0, -0.8, 1.0);
 	glEnd();
 
 	glPopMatrix();
@@ -517,6 +622,7 @@ void showInfo()
 
 	if (game.getStatus())
 	{
+		gameOver = true;
 		if (game.getWinner() != NULL) 
 		{
 			if (game.getWinner()->getMark() == 'O') 
@@ -822,6 +928,7 @@ void keyboardCB(unsigned char key, int x, int y)
 		case 'r':
 		case 'R':
 			game.reset();
+			gameOver = false;
 			cout << "R: P1 '" << game.getPlayer()->getMark() << "' and opponent '" << game.getPlayer()->getOpponent()->getMark() << "'\n";
 
 
@@ -1009,32 +1116,81 @@ void mouseMotionCB(int x, int y)
 			glRotatef(cameraAngleX, 1, 0, 0);			// Pitch
 			glRotatef(cameraAngleY, 0, 1, 0);			// Heading
 
-			if (i == 0) {
-				x -= 3;
-				y += 3;
-			}else if (i == 1) {
-				y += 3;
-			}else if (i == 2) {
-				x += 3;
-				y += 3;
-			}else if (i == 3) {
-				x -= 3;
-			}else if (i == 4) {
-				x = 0;
-				y = 0;
-			}else if (i == 5) {
-				x += 3;
-			}else if (i == 6) {
-				x -= 3;
-				y -= 3;
-			}else if (i == 7) {
-				y -= 3;
-			}else if (i == 8) {
-				x = 3;
-				y = -3;
+			if (square[i])
+			{
+				if (i == 0) {
+					x -= 3;
+					y += 3;
+				}
+				else if (i == 1) {
+					y += 3;
+				}
+				else if (i == 2) {
+					x += 3;
+					y += 3;
+				}
+				else if (i == 3) {
+					x -= 3;
+				}
+				else if (i == 5) {
+					x += 3;
+				}
+				else if (i == 6) {
+					x -= 3;
+					y -= 3;
+				}
+				else if (i == 7) {
+					y -= 3;
+				}
+				else if (i == 8) {
+					x = 3;
+					y = -3;
+				}
+
+				drawSquare(x, y, z, i + 2);
 			}
 
-			drawSquare(x, y, z, gSquareId[i]);
+			else
+			{
+				if (i == 0) {
+					x -= 3;
+					y += 3;
+				}
+				else if (i == 1) {
+					y += 3;
+				}
+				else if (i == 2) {
+					x += 3;
+					y += 3;
+				}
+				else if (i == 3) {
+					x -= 3;
+				}
+				else if (i == 5) {
+					x += 3;
+				}
+				else if (i == 6) {
+					x -= 3;
+					y -= 3;
+				}
+				else if (i == 7) {
+					y -= 3;
+				}
+				else if (i == 8) {
+					x = 3;
+					y = -3;
+				}
+
+				if (moveList[i] == 'x')
+				{
+					drawX(x, y, z, i + 2);
+				}
+
+				else if (moveList[i] == 'o')
+				{
+					drawSphere(x, y, z, i + 2);
+				}
+			}
 			glPopMatrix();
 			hlEndShape();
 		}

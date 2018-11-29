@@ -12,7 +12,6 @@ Game::Game(){
    p1.setBoard(board);
    p2.setBoard(board);
    currentPlayer = &p1;
-	gameOver = false;
    winner = NULL;
 }
 
@@ -36,13 +35,10 @@ Player* Game::getPlayer() {
 bool Game::getStatus() {
 	if (board->xWins() || board->oWins() || board->isFull()) {
 		setWinner();
-		gameOver = true;
+		return true;
 	}
 	else
-		gameOver = false;
-
-	return gameOver;
-
+		return false;
 }
 
 Board Game::getBoard() {

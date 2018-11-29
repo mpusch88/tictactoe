@@ -2,18 +2,17 @@
 #include <iostream>
 using namespace std;
 
-Game::Game(){
-   p1 = Player('X');
-   p2 = Player('O');
-   b = Board();
-   board = &b;
-   p1.setOpponent(p2);
-   p2.setOpponent(p1);  
-   p1.setBoard(board);
-   p2.setBoard(board);
-   currentPlayer = &p1;
-	gameOver = false;
-   winner = NULL;
+Game::Game() {
+	p1 = Player('X');
+	p2 = Player('O');
+	b = Board();
+	board = &b;
+	p1.setOpponent(p2);
+	p2.setOpponent(p1);
+	p1.setBoard(board);
+	p2.setBoard(board);
+	currentPlayer = &p1;
+	winner = NULL;
 }
 
 void Game::updateBoard(int spot) {
@@ -36,13 +35,10 @@ Player* Game::getPlayer() {
 bool Game::getStatus() {
 	if (board->xWins() || board->oWins() || board->isFull()) {
 		setWinner();
-		gameOver = true;
+		return true;
 	}
 	else
-		gameOver = false;
-
-	return gameOver;
-
+		return false;
 }
 
 Board Game::getBoard() {

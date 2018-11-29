@@ -125,6 +125,7 @@ void updateWorkspace();
 
 // global variables
 Game game;
+bool gameOver = false;
 GLuint listId = 0;                      // REMOVE THIS AND REFS!
 int count = 0;
 void *font = GLUT_BITMAP_8_BY_13;
@@ -162,15 +163,13 @@ int stereo = 1; // if stereo=0 rendering mono view
 #ifdef HAPTIC
 void HLCALLBACK touchShapeCallback(HLenum event, HLuint object, HLenum thread,
 	HLcache *cache, void *userdata) {
-	if (!set[object - 2]) {
+	if (!set[object - 2] && !gameOver) {
 		touched = !touched;
 		game.updateBoard(object - 2);
 		game.updatePlayer();
-
+		color(object);
 	}
-	//game.updateBoard(object - 2);
 	cout << "object is" << object << endl;
-	color(object);
 }
 #endif
 
@@ -499,6 +498,7 @@ void showInfo()
 
 	if (game.getStatus())
 	{
+		gameOver = true;
 		if (game.getWinner() != NULL) {
 
 			if (game.getWinner()->getMark() == 'O') {
@@ -738,6 +738,7 @@ void keyboardCB(unsigned char key, int x, int y)
 	case 'r':
 	case 'R':
 		game.reset();
+		gameOver = false;
 		cout << "R: P1 '" << game.getPlayer()->getMark() << "' and opponent '" << game.getPlayer()->getOpponent()->getMark() << "'\n";
 
 
