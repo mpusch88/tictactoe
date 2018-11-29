@@ -156,7 +156,7 @@ int stereo = 1;
 
 	void HLCALLBACK touchShapeCallback(HLenum event, HLuint object, HLenum thread, HLcache *cache, void *userdata)
 	{
-		if (!set[object - 2])
+		if (!set[object - 2] && !gameOver)
 		{
 			touched = !touched;
 			game.updateBoard(object - 2);
