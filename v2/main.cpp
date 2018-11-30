@@ -59,9 +59,8 @@ CAMERA camera;
 	static HHLRC ghHLRC = 0;
 
 	/* Shape id for shape we will render haptically. */
-	HLuint gTeapotShapeId;
 	HLuint gSquareId[9];
-	#define CURSOR_SCALE_SIZE 60
+	#define CURSOR_SCALE_SIZE 100
 	static double gCursorScale;
 	static GLuint gCursorDisplayList = 0;
 	#else
@@ -111,8 +110,8 @@ void drawSquare(float x, float y, float z, int id);
 #endif
 
 // Global Variables
-float diffuseColorRed[3] = { 0.929524f, 0.1f, 0.178823f };
-float diffuseColorGreen[3] = { 0.3f, 0.53f, 0.54f };
+float diffuseColorRed[3] = { .66, 0, 0 };
+float diffuseColorGreen[3] = { 0,.66,0 };
 float diffuseColors[9][3];
 Timer timer;
 Game game;
@@ -1236,14 +1235,14 @@ void mouseMotionCB(int x, int y)
 		glScaled(gCursorScale, gCursorScale, gCursorScale);
 		glEnable(GL_COLOR_MATERIAL);
 
-		if(game.getPlayer().getMark() == 'X')		// Setting cursor to color of current player
-			glColor3f(diffuseColorRed);
+		if (game.getStatus())
+				glColor3f(1.0, 1.0, 1.0);
 
-		else if(game.getPlayer().getMark() == 'O')
-			glColor3v(diffuseColorGreen);
+		else if(game.getPlayer()->getMark() == 'X')
+			glColor3f(1,0,0);
 
 		else
-			glColor3f(1.0,1.0,1.0);
+			glColor3f(0,1,0);
 
 		glCallList(gCursorDisplayList);
 		glPopMatrix();

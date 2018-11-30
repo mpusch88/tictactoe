@@ -32,7 +32,7 @@ Player* Game::getPlayer() {
 	return currentPlayer;
 }
 
-bool Game::getStatus() {
+bool Game::getStatus() {		// Returns false if game is still running
 	if (board->xWins() || board->oWins() || board->isFull()) {
 		setWinner();
 		return true;

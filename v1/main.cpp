@@ -64,7 +64,6 @@ CAMERA camera;
 	static HHLRC ghHLRC = 0;
 
 	/* Shape id for shape we will render haptically. */
-	HLuint gTeapotShapeId;
 	HLuint gSquareId[9];
 	#define CURSOR_SCALE_SIZE 60
 	static double gCursorScale;
