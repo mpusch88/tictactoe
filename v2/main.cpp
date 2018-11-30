@@ -111,7 +111,6 @@ void drawSquare(float x, float y, float z, int id);
 #endif
 
 // Global Variables
-
 float diffuseColorRed[3] = { 0.929524f, 0.1f, 0.178823f };
 float diffuseColorGreen[3] = { 0.3f, 0.53f, 0.54f };
 float diffuseColors[9][3];
@@ -509,8 +508,6 @@ void initGL()
 	initLights();
 	setCamera(0, 0, 10, 0, 0, 0);
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // write 2d text using GLUT
@@ -1238,7 +1235,16 @@ void mouseMotionCB(int x, int y)
 		// Apply the local cursor scale factor.
 		glScaled(gCursorScale, gCursorScale, gCursorScale);
 		glEnable(GL_COLOR_MATERIAL);
-		glColor3f(0.0, 0.5, 1.0);
+
+		if(game.getPlayer().getMark() == 'X')		// Setting cursor to color of current player
+			glColor3f(diffuseColorRed);
+
+		else if(game.getPlayer().getMark() == 'O')
+			glColor3v(diffuseColorGreen);
+
+		else
+			glColor3f(1.0,1.0,1.0);
+
 		glCallList(gCursorDisplayList);
 		glPopMatrix();
 		glPopAttrib();
