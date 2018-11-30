@@ -1,3 +1,3 @@
 # tictactoe
 	
-	OpenGL based Tic-tac-toe game.
+	OpenGL/OpenHaptics based Tic-tac-toe game.
